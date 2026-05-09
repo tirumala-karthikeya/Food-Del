@@ -29,7 +29,7 @@ const listFood = async(req,res)=>{
       res.json({success:true,data:foods})
     } catch (error) {
       console.log(error)
-      res.json({success:false,message:"error"})
+      res.json({success:false,message:"error",error:String(error && error.message || error)})
     }
 }
 // remove food item
