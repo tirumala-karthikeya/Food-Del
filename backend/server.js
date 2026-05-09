@@ -1,6 +1,5 @@
 import express from "express"
 import cors from "cors"
-import { fileURLToPath } from "url"
 import { connectDB } from "./config/db.js"
 import foodRouter from "./routes/foodRoute.js"
 import userRouter from "./routes/userRoute.js"
@@ -26,8 +25,7 @@ app.get("/", (req, res) => {
   res.send("api working")
 })
 
-const isMain = process.argv[1] && process.argv[1] === fileURLToPath(import.meta.url)
-if (isMain) {
+if (!process.env.NETLIFY && !process.env.LAMBDA_TASK_ROOT) {
   app.listen(port, () => {
     console.log(`server started on http://localhost:${port}`)
   })
