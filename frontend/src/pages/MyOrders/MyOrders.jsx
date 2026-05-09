@@ -6,58 +6,69 @@ import { assets } from '../../assets/assets';
 
 const MyOrders = () => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { url, token } = useContext(StoreContext);
 
   const fetchOrders = async () => {
+    if (!token) return;
+    setLoading(true);
     try {
-      if (!token) {
-        console.log("No token available.");
-        return;
-      }
-      console.log("Fetching orders with token:", token);
-      const response = await axios.post(`${url}/api/order/userorders`, {}, { 
-        headers: { Authorization: `Bearer ${token}` } 
-      });
-      console.log("Response received:", response);
-      if (response.data && response.data.data) {
+      const response = await axios.post(
+        `${url}/api/order/userorders`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data?.success && Array.isArray(response.data.data)) {
         setData(response.data.data);
-        console.log("Orders fetched successfully:", response.data.data);
       } else {
-        console.log("No data in response:", response.data);
+        setData([]);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      fetchOrders();
-    }
+    if (token) fetchOrders();
+    else setLoading(false);
   }, [token]);
+
+  if (loading) {
+    return (
+      <div className='my-orders'>
+        <h2>My Orders</h2>
+        <p>Loading…</p>
+      </div>
+    );
+  }
 
   return (
     <div className='my-orders'>
       <h2>My Orders</h2>
       <div className="container">
-        {data.length > 0 ? data.map((order, index) => (
-          <div key={index} className="my-orders-order">
-            <img src={assets.parcel_icon} alt="Parcel icon" />
-            <p>
-              {order.items.map((item, idx) => (
-                <span key={idx}>
-                  {item.name} x {item.quantity}
-                  {idx !== order.items.length - 1 ? ', ' : ''}
-                </span>
-              ))}
-            </p>
-            <p>${order.amount}.00</p>
-            <p>Items: {order.items.length}</p>
-            <p><span>&#x25cf;</span><b>{order.status}</b></p>
-            <button onClick={fetchOrders}>Track Order</button>
-          </div>
-        )) : (
+        {data.length === 0 ? (
           <p>No orders found.</p>
+        ) : (
+          data.map((order) => (
+            <div key={order._id} className="my-orders-order">
+              <img src={assets.parcel_icon} alt="Parcel icon" />
+              <p>
+                {order.items
+                  .map((item) => `${item.name} x ${item.quantity}`)
+                  .join(", ")}
+              </p>
+              <p>${order.amount}.00</p>
+              <p>Items: {order.items.length}</p>
+              <p>
+                <span>&#x25cf;</span>{" "}
+                <b>{order.status === "Food Proccessing" ? "Food Processing" : order.status}</b>
+              </p>
+              <button onClick={fetchOrders}>Track Order</button>
+            </div>
+          ))
         )}
       </div>
     </div>
