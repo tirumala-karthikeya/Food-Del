@@ -6,8 +6,10 @@ const foodRouter = express.Router();
 
 //Image Storage Engine
 
+const uploadDir = process.env.NETLIFY ? "/tmp/uploads" : "uploads"
+
 const storage = multer.diskStorage({
-    destination: "uploads",
+    destination: uploadDir,
     filename: (req,file,cb) =>{
         return cb(null,`${Date.now()}${file.originalname}`)
     }
