@@ -80,25 +80,19 @@ const StoreContextProvider = (props) => {
   };
 
   useEffect(() => {
-    async function loadData() {
-      await fetchFoodList();
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
-        await loadCartData(storedToken);
-      }
-  
-      const storedCartItems = localStorage.getItem("cartItems");
-      if (storedCartItems) {
-        setCartItems(JSON.parse(storedCartItems));
-      }
-  
-      const storedUserId = localStorage.getItem("userId");
-      if (storedUserId) {
-        setUserId(storedUserId); // assuming setUserId is defined to store userId in state
-      }
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
     }
-    loadData();
+    const storedCartItems = localStorage.getItem("cartItems");
+    if (storedCartItems) {
+      setCartItems(JSON.parse(storedCartItems));
+    }
+
+    fetchFoodList();
+    if (storedToken) {
+      loadCartData(storedToken);
+    }
   }, []);
   
 
