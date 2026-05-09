@@ -6,7 +6,8 @@ const foodRouter = express.Router();
 
 //Image Storage Engine
 
-const uploadDir = process.env.NETLIFY ? "/tmp/uploads" : "uploads"
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY)
+const uploadDir = isLambda ? "/tmp/uploads" : "uploads"
 
 const storage = multer.diskStorage({
     destination: uploadDir,

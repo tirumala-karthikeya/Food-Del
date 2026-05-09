@@ -25,7 +25,8 @@ app.get("/", (req, res) => {
   res.send("api working")
 })
 
-if (!process.env.NETLIFY && !process.env.LAMBDA_TASK_ROOT) {
+const isLambda = !!(process.env.LAMBDA_TASK_ROOT || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY)
+if (!isLambda) {
   app.listen(port, () => {
     console.log(`server started on http://localhost:${port}`)
   })
