@@ -13,7 +13,18 @@ const port = process.env.PORT || 4000
 app.use(express.json())
 app.use(cors())
 
-connectDB().catch((err) => console.error("DB connect error:", err))
+// Ensure MongoDB is connected before any /api route runs. On a cold
+// serverless container the first query would otherwise fire before the
+// connection is ready and hit Mongoose's 10s buffering timeout.
+app.use("/api", async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (err) {
+    console.error("DB connect error:", err)
+    res.status(503).json({ success: false, message: "Database unavailable" })
+  }
+})
 
 app.use("/api/food", foodRouter)
 app.use("/images", express.static('uploads'))
