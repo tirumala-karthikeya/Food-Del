@@ -29,7 +29,9 @@ const listFood = async(req,res)=>{
       res.json({success:true,data:foods})
     } catch (error) {
       console.log(error)
-      res.json({success:false,message:"error"})
+      const uri = process.env.MONGODB_URI || ""
+      const host = (uri.match(/@([^/?]+)/) || [])[1] || "(no MONGODB_URI set)"
+      res.json({success:false,message:"error",debug:String(error && error.message || error),host})
     }
 }
 // remove food item
